@@ -21,3 +21,4 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/user', 'UserController@index');
 Route::resource('/user/files', 'FileController');
 Route::resource('/user/folders', 'FolderController');
+Route::get('user/files/dl/{id}', 'FileController@downloadFile');

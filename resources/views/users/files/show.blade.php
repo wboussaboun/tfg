@@ -7,15 +7,24 @@
   <tr>
     <th scope="col">#</th>
     <th scope="col">name</th>
-    <th scope="col">Owner</th>
+    <th scope="col">Download</th>
   </tr>
 </thead>
 <tbody>
     <tr>
       <td>{{$file->id}}</td>
       <td>{{$file->name}}</td>
-      <td><button>Delete File</button></td>
+      <td>
+        <form method="get" action="/user/files/dl/{{$file->id}}">
+
+          <div class="form-group">
+            {!! Form::submit('Download File', ['class' => 'btn btn-primary']) !!}
+          </div>
+
+        </form>
+      </td>
     </tr>
 </tbody>
 </table>
+
 @endsection

@@ -116,5 +116,13 @@ class FileController extends Controller
       } return "not cool";
     }
 
+    public function downloadFile($id)
+    {
+      $path = File::find($id)->getPath();
+      return response()->download(storage_path("app/".'storage/'.Auth::user()->name.$path));
+
+
+    }
+
 
 }
