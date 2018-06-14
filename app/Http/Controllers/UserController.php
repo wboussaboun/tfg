@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\User;
 
 class UserController extends Controller
 {
@@ -54,9 +56,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
-        //PROFILE
+        $user = Auth::user();
+        return view('users.show', compact('user'));
     }
 
     /**
@@ -65,9 +68,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit()
     {
-        //EDIT PROFILE
+      $user = Auth::user();
+      return view('users.edit', compact('user'));
     }
 
     /**
@@ -77,9 +81,22 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //CHANGE USER PROFILE
+      $user = Auth::user();
+      $file = $request->file('file');
+
+      if ($file!=null){
+
+        $user->update(['name' => ''.$request->name,'profile_photo' => ''.$file->getClientOriginalName()]);
+        Storage::disk('local')->putFileAs('Profile/'.Auth::user()->id, $file,$file->getClientOriginalName());
+      }else {
+        $user->update(['name' => ''.$request->name]);
+      }
+
+
+
+      return view('users.index', compact('user'));
     }
 
     /**
@@ -88,8 +105,37 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
-        //DELETE PROFILE
+        $user = Auth::user();
+        Storage::disk('local')->deleteDirectory('Profile/'.Auth::user()->id);
+        $user->delete();
     }
+
+    public function profilePhoto($id){
+      return response()->download(storage_path('app/Profile/'.Auth::user()->id.'/'.Auth::user()->profile_photo));
+    }
+
+    public function showMyFriends(){
+      $user = Auth::user();
+      return view('users.friends.show', compact('user'));
+    }
+    public function addFriend(){
+      $user = Auth::user();
+      return view('users.friends.create', compact('user'));
+    }
+
+    public function storeFriend(Request $request){
+      $friend = User::where('name',$request->name)->first();
+      Auth::user()->friends()->save($friend);
+      return view('users.friends.show', compact('user'));
+    }
+
+    public function deleteFriend($id)
+    {//asegurarse de esto
+        $user = Auth::user();
+        $user->friends->find($id)->delete();
+    }
+
+
 }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.logged')
 @section('title')
 @endsection
 @section('content')
@@ -8,6 +8,9 @@
     <th scope="col">#</th>
     <th scope="col">name</th>
     <th scope="col">Download</th>
+    @if($user->id==$file->user_id)
+    <th scope="col">Share</th>
+    @endif
   </tr>
 </thead>
 <tbody>
@@ -23,6 +26,13 @@
 
         </form>
       </td>
+      @if($user->id==$file->user_id)
+      <td>
+          <div class="form-group">
+            <a href="/user/file/share/{{$file->id}}">Share File<a>
+          </div>
+      </td>
+      @endif
     </tr>
 </tbody>
 </table>

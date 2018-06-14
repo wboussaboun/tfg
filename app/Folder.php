@@ -36,4 +36,8 @@ class Folder extends Model
   public function isOwner($id){
     return $id==$this->id;
   }
+
+  public function sharedWith(){
+    return $this->belongsToMany('App\User');
+  }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.logged')
 @section('title')
 {{$folder->name}}
 @endsection
@@ -16,6 +16,9 @@
     <th scope="col">name</th>
     <th scope="col">Owner</th>
     <th scope="col">Delete</th>
+    @if($user->id==$folder->user_id)
+    <th scope="col">Share</th>
+    @endif
   </tr>
 </thead>
 <tbody>
@@ -25,6 +28,13 @@
       <td><a href="/user/folders/{{$cFolder->id}}">{{$cFolder->name}}</a></td>
       <td>{{$user->name}}</td>
       <td><button class="deleteFolder" data-id="{{$cFolder->id}}">Delete Folder</button></td>
+      @if($user->id==$cFolder->user_id)
+      <td>
+          <div class="form-group">
+            <a href="/user/folder/share/{{$cFolder->id}}">Share Folder<a>
+          </div>
+      </td>
+      @endif
     </tr>
   @endforeach
   @foreach($folder->childFiles as $cFile)
@@ -33,6 +43,13 @@
       <td><a href="/user/files/{{$cFile->id}}">{{$cFile->name}}</a></td>
       <td>{{$user->name}}</td>
       <td><button class="deleteFile" data-id="{{$cFile->id}}">Delete File</button></td>
+      @if($user->id==$cFile->user_id)
+      <td>
+          <div class="form-group">
+            <a href="/user/file/share/{{$file->id}}">Share File<a>
+          </div>
+      </td>
+      @endif
     </tr>
   @endforeach
 </tbody>

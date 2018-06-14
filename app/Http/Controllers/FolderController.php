@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Folder;
+use App\User;
 
 class FolderController extends Controller
 {
@@ -70,11 +71,11 @@ class FolderController extends Controller
       $id=intval($id);
       $folder = Folder::find($id);
       $user = Auth::user();
-      if($folder->user_id == $user->id){
+      //if($folder->user_id == $user->id){
         session(['currentFolder' => $id]);
         return view('users.folders.show', compact('user','folder'));
-      }
-      else return redirect('/user/folders');
+      //}
+      //else return redirect('/user/folders');
     }
 
     /**
@@ -103,7 +104,7 @@ class FolderController extends Controller
         $folder->update(['name' => ''.$request->name]);
         $newPath = 'storage/'.Auth::user()->name.'/'.$folder->getPath();
         Storage::move( $oldPath, $newPath);
-        return redirect($newPath);
+        return redirect('user/folders'.$folder->id);
     }
 
     /**
@@ -123,5 +124,38 @@ class FolderController extends Controller
         Storage::disk('local')->deleteDirectory('storage/'.Auth::user()->name.'/'.$path);
         return "cool";
       } return "not cool";
+    }
+
+    public function share($id)
+    {
+      $folder = Folder::find($id);
+      $user = Auth::user();
+      return view('users.folders.share', compact('folder','user'));
+    }
+
+    public function shareWith(Request $request){//rehacer, recursividad?
+
+      $targetUser = User::where('name', $request->name)->first();
+
+      $folder = Folder::find($request->folderID);
+      $targetUser->sharedFolders()->save($folder);
+
+      foreach ($folder->childFolders as $cFolder) {
+        $targetUser->sharedFolders()->save($cFolder);
+      }
+
+      foreach ($folder->childFiles as $cFile) {
+        $targetUser->sharedFiles()->save($cFile);
+      }
+
+      return $targetUser->sharedFolders.'<br>'.$targetUser->sharedFiles;
+
+    }
+
+    public function showMySharedFolders(){
+      $user = Auth::user();
+      $folders = $user->sharedFolders;
+      return view('users.folders.showSharedFolders',compact('user','folders'));
+
     }
 }

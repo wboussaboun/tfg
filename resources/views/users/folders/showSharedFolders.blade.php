@@ -1,8 +1,12 @@
 @extends('layouts.logged')
 @section('title')
-{{$user->name}}'s Storage
+folders
+@endsection
+@section('sidenavActions')
+
 @endsection
 @section('content')
+
 <table class="table">
 <thead>
   <tr>
@@ -12,13 +16,14 @@
   </tr>
 </thead>
 <tbody>
-  @foreach($user->files as $file)
+  @foreach($folders as $cFolder)
     <tr>
-      <td>{{$file->id}}</td>
-      <td><a href="/user/files/{{$file->id}}">{{$file->name}}</a></td>
-      <td>{{$user->name}}</td>
+      <td>{{$cFolder->id}}</td>
+      <td><a href="/user/folders/{{$cFolder->id}}">{{$cFolder->name}}</a></td>
+      <td>{{$cFolder->user_id}}</td>
     </tr>
   @endforeach
 </tbody>
 </table>
+<div id="results"></div>
 @endsection

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\File;
 use App\Folder;
+use App\User;
 
 class FileController extends Controller
 {
@@ -67,11 +68,12 @@ class FileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-      $file = File::find($id);
-      return view('users.files.show', compact('file'));
-    }
+     public function show($id)
+     {
+       $file = File::find($id);
+       $user = Auth::user();
+       return view('users.files.show', compact('file','user'));
+     }
 
     /**
      * Show the form for editing the specified resource.
@@ -124,5 +126,23 @@ class FileController extends Controller
 
     }
 
+    public function share($id)
+    {
+      $file = File::find($id);
+      $user = Auth::user();
+      return view('users.files.share', compact('file','user'));
+    }
 
+    public function shareWith(Request $request){
+      $targetUser = User::where('name', $request->name)->first();
+      return $targetUser->sharedFiles()->save(File::find($request->fileID));
+
+    }
+
+    public function showMySharedFiles(){
+      $user = Auth::user();
+      $files = $user->sharedFiles;
+      return view('users.files.showSharedFiles',compact('user','files'));
+
+    }
 }

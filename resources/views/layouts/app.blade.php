@@ -15,6 +15,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="/css/sidebar.css" rel="stylesheet">
     <script src="/js/sidebar.js"></script>
+    @yield('html_head')
 </head>
 <body>
     <div id="app">
@@ -55,6 +56,10 @@
                                 </a>
 
                                 <ul class="dropdown-menu" role="menu">
+                                    @yield('profilePhoto')
+                                    <li>
+                                      <a href="/user/profile">My profile</a>
+                                    </li>
                                     <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
@@ -80,11 +85,13 @@
 
         <div id="main">
           <span onclick="openNav()">></span>
+
         @yield('content')
       </div>
     </div>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    @yield('extraScripts')
 </body>
 </html>

@@ -26,4 +26,8 @@ class File extends Model
       if($this->folder_id==null) return "";
       else return Folder::find($this->folder_id)->getPath().'/'.$this->name;
     }
+
+    public function sharedWith(){
+      return $this->belongsToMany('App\User');
+    }
 }

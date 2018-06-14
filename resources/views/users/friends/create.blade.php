@@ -1,12 +1,12 @@
 @extends('layouts.logged')
 @section('title')
-{{$user->name}}'s Storage
+{{$user->name}}'s Friends
 @endsection
 @section('content')
-  {!! Form::open(['method' => 'POST', 'action'=>'FolderController@store']) !!}
+  {!! Form::open(['method' => 'POST', 'action'=>'UserController@storeFriend']) !!}
     <div class="form-group">
       {!! Form::text('name', null, ['class'=> 'form-controll']) !!}
-      {!! Form::submit('Create Folder', ['class' => 'btn btn-primary']) !!}
+      {!! Form::submit('Add Friend', ['class' => 'btn btn-primary']) !!}
     </div>
 
   {!! Form::close() !!}
