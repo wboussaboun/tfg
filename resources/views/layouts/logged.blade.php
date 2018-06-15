@@ -5,7 +5,7 @@
   </li>
 @endsection
 
-@section('extraScripts')
+@section('photoScript')
   <script>
     $(document).ready(function() {
         $.ajax(

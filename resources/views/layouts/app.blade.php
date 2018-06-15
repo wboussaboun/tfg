@@ -92,6 +92,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
-    @yield('extraScripts')
+    @yield('photoScript')
 </body>
 </html>

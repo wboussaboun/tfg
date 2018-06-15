@@ -109,7 +109,10 @@ class UserController extends Controller
     {
         $user = Auth::user();
         Storage::disk('local')->deleteDirectory('Profile/'.Auth::user()->id);
+        $user->files()->delete();
+        $user->folders()->delete();
         $user->delete();
+        return view('/');
     }
 
     public function profilePhoto($id){
@@ -134,7 +137,7 @@ class UserController extends Controller
     public function deleteFriend($id)
     {//asegurarse de esto
         $user = Auth::user();
-        $user->friends->find($id)->delete();
+        $user->friends->find($id)->detach();
     }
 
 

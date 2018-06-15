@@ -37,3 +37,4 @@ Route::get('/friends', 'UserController@showMyFriends');
 Route::get('/friends/add', 'UserController@addFriend');
 Route::post('/friends/store', 'UserController@storeFriend');
 Route::delete('/friend/delete', 'UserController@deleteFriend');
+Route::resource('/tasks', 'TasksController');

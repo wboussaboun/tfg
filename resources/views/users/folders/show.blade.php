@@ -46,7 +46,7 @@
       @if($user->id==$cFile->user_id)
       <td>
           <div class="form-group">
-            <a href="/user/file/share/{{$file->id}}">Share File<a>
+            <a href="/user/file/share/{{$cFile->id}}">Share File<a>
           </div>
       </td>
       @endif
