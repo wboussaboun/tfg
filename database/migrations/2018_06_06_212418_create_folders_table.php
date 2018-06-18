@@ -18,6 +18,7 @@ class CreateFoldersTable extends Migration
             $table->string('name');
             $table->integer('user_id')->unsigned();
             $table->string('folder_id')->nullable();
+            $table->integer('favorite')->default(0);
             $table->timestamps();
         });
     }

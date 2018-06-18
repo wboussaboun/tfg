@@ -3,31 +3,32 @@
 {{$user->name}}'s Storage
 @endsection
 @section('html_head')
-<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.css' />
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.2.7/fullcalendar.min.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+<script src="/css/fullcalendar.min.js"></script>
+@endsection
+@section('sidenavActions')
+<a href="/tasks/create">Create Event</a>
 @endsection
 @section('content')
 
 
 <h3>Calendar</h3>
 
-<div id='calendar'></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">Full Calendar Example</div>
 
-<script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.min.js'></script>
-<script>
-    $(document).ready(function() {
-        // page is now ready, initialize the calendar...
-        $('#calendar').fullCalendar({
-            // put your options and callbacks here
-            events : [
-                @foreach($tasks as $task)
-                {
-                    title : '{{ $task->name }}',
-                    start : '{{ $task->task_date }}',
-                    url : '{{ route('tasks.edit', $task->id) }}'
-                },
-                @endforeach
-            ]
-        })
-    });
-</script>
+                <div class="panel-body">
+                    {!! $calendar->calendar() !!}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{!! $calendar->script() !!}
 @endsection

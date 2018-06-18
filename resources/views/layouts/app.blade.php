@@ -11,11 +11,12 @@
     <title>@yield('title')</title>
 
     <!-- Styles -->
-    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    @yield('html_head')
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="/css/sidebar.css" rel="stylesheet">
     <script src="/js/sidebar.js"></script>
-    @yield('html_head')
+
 </head>
 <body>
     <div id="app">
@@ -91,7 +92,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+
     @yield('photoScript')
 </body>
 </html>

@@ -18,6 +18,7 @@
     <th scope="col">Delete</th>
     @if($user->id==$folder->user_id)
     <th scope="col">Share</th>
+    <th scope="col">Favorite</th>
     @endif
   </tr>
 </thead>
@@ -34,6 +35,9 @@
             <a href="/user/folder/share/{{$cFolder->id}}">Share Folder<a>
           </div>
       </td>
+      <td>
+          <button class="favFolder" data-id="{{$cFolder->id}}">Delete Folder</button>
+      </td>
       @endif
     </tr>
   @endforeach
@@ -48,6 +52,9 @@
           <div class="form-group">
             <a href="/user/file/share/{{$cFile->id}}">Share File<a>
           </div>
+      </td>
+      <td>
+          <button class="favFile" data-id="{{$cFile->id}}">Delete File</button>
       </td>
       @endif
     </tr>
@@ -88,10 +95,41 @@ $(".deleteFile").click(function(){
               $("#results").html(result);
               $(".file-"+id).remove();
             }
-        });
+          });
+$(".favFolder").click(function(){
+                      var id = $(this).data("id");
+                      $.ajax(
+                      {
+                          url: "/user/folders/fav/"+id,
+                          type: 'PUT',
+                          data: {
+                              '_token': $('input[name=_token]').val(),
+                          },
+                          success: function(result){
+                            if (result==1) $("#results").html('success');
+                            else $("#results").html('error');
+                          }
+                      });
 
 
-    });
+                  });
+
+$(".favFile").click(function(){
+  var id = $(this).data("id");
+  $.ajax(
+  {
+    url: "/user/files/fav/"+id,
+    type: 'PUT',
+    data: {
+      '_token': $('input[name=_token]').val(),
+    },
+      success: function(result){
+      if (result==1) $("#results").html('success');
+        else $("#results").html('error');
+    }
+});
+
+});
 
 });
 </script>

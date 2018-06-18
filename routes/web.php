@@ -38,3 +38,4 @@ Route::get('/friends/add', 'UserController@addFriend');
 Route::post('/friends/store', 'UserController@storeFriend');
 Route::delete('/friend/delete', 'UserController@deleteFriend');
 Route::resource('/tasks', 'TasksController');
+Route::delete('/user/folders/fav/{id}', 'FolderController@fav');

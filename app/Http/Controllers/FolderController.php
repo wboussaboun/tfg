@@ -158,4 +158,10 @@ class FolderController extends Controller
       return view('users.folders.showSharedFolders',compact('user','folders'));
 
     }
+
+    public function fav($id){
+      $folder = $user->folders()->find($id);
+      if($folder->favorite) $folder->update(['favorite' => 0]);
+      else $folder->update(['favorite' => 1]);
+    }
 }

@@ -4,6 +4,6 @@
 @endsection
 @section('content')
 <a href="/user/folders">Go to my files</a><br>
-<a href="/user">Show Profile (no implementado)</a><br>
-<a href="/user">Edit profile (no implementado)</a>
+<a href="/tasks">Calendario</a><br>
+<a href="/friends">Amigos</a>
 @endsection
