@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
 use App\File;
 use App\Folder;
 use App\User;
+use finfo;
 
 class FileController extends Controller
 {
@@ -36,7 +38,9 @@ class FileController extends Controller
     public function create()
     {
         $user = Auth::user();
-        return view('users.files.create',compact('user'));
+        $folder = Folder::find(session()->get('currentFolder'));
+        if($folder->user_id == $user->id || $user->sharedFolders()->findOrFail($folder->id)) return view('users.files.create',compact('user'));
+        else return redirect('/user/folders/');
     }
 
     /**
@@ -48,18 +52,29 @@ class FileController extends Controller
     public function store(Request $request)
     {
         $clientFile = $request->file('file');
+        $user = Auth::user();
+        $pFolder = Folder::find(session()->get('currentFolder'));
+        if ($clientFile->getClientSize() > 104857600) return "file too big";
 
+        if($pFolder->user_id == $user->id || $user->sharedFolders()->findOrFail($pFolder->id)){
+          //if(!preg_match('/\.\.*/', $clientFile->getClientOriginalName()) && !preg_match('/\//', $clientFile->getClientOriginalName())){
+            $file = new File();
+            $file->name = $clientFile->getClientOriginalName();
+            $file->user_id = $pFolder->user_id;
+            $file->folder_id = $request->session()->get('currentFolder');
+            $file->save();
 
-        $file = new File();
-        $file->name = $clientFile->getClientOriginalName();
-        $file->user_id = Auth::id();
-        $file->folder_id = $request->session()->get('currentFolder');
-        $file->save();
+            $path = Folder::find($file->folder_id)->getPath();
 
-        $path = Folder::find($file->folder_id)->getPath();
+            $encFile = Crypt::encrypt(file_get_contents($clientFile));
 
-        Storage::disk('local')->putFileAs('storage/'.Auth::user()->name.'/'.$path, $clientFile,$file->name);
-        return redirect('/user/folders/'.$file->folder_id);
+            file_put_contents($clientFile, $encFile);
+
+            Storage::disk('local')->putFileAs('storage/'.User::find($pFolder->user_id)->name.'/'.$path, $clientFile,$file->name);
+
+            return redirect('/user/folders/'.$file->folder_id);
+          //}else return "filename problem";
+        }else return "user problem";
     }
 
     /**
@@ -72,7 +87,8 @@ class FileController extends Controller
      {
        $file = File::find($id);
        $user = Auth::user();
-       return view('users.files.show', compact('file','user'));
+       if($file->user_id == $user->id || $user->sharedFiles()->findOrFail($id)) return view('users.files.show', compact('file','user'));
+       else return redirect('/user/folders/');
      }
 
     /**
@@ -83,7 +99,7 @@ class FileController extends Controller
      */
     public function edit($id)
     {
-      return view('users.files.edit');
+      return redirect('/user/folders/');
     }
 
     /**
@@ -121,9 +137,13 @@ class FileController extends Controller
     public function downloadFile($id)
     {
       $path = File::find($id)->getPath();
-      return response()->download(storage_path("app/".'storage/'.Auth::user()->name.$path));
+      $file = Storage::disk('local')->get('storage/'.Auth::user()->name.$path);
+      $decryptedContents = Crypt::decrypt($file);
 
-
+      return response()->make($decryptedContents, 200, array(
+          'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
+          'Content-Disposition' => 'attachment; filename="' . pathinfo($path, PATHINFO_BASENAME) . '"'
+      ));
     }
 
     public function share($id)
@@ -144,5 +164,12 @@ class FileController extends Controller
       $files = $user->sharedFiles;
       return view('users.files.showSharedFiles',compact('user','files'));
 
+    }
+
+    public function fav($id){
+      $user = Auth::user();
+      $file = $user->files()->find($id);
+      if($file->favorite) $file->update(['favorite' => 0]);
+      else $file->update(['favorite' => 1]);
     }
 }

@@ -37,7 +37,9 @@ class FolderController extends Controller
     public function create()
     {
       $user = Auth::user();
-      return view('users.folders.create',compact('user'));
+      $folder = Folder::find(session()->get('currentFolder'));
+      if($folder->user_id == $user->id || $user->sharedFolders()->findOrFail($folder->id)) return view('users.folders.create',compact('user'));
+      else return redirect('/user/folders/');
     }
 
     /**
@@ -48,16 +50,25 @@ class FolderController extends Controller
      */
     public function store(Request $request)
     {
-      $folder = new Folder();
-      $folder->name = $request->name;
-      $folder->user_id = Auth::id();
-      $folder->folder_id = $request->session()->get('currentFolder');
-      $folder->save();
+      $user = Auth::user();
+      $pFolder = Folder::find(session()->get('currentFolder'));
+      if($pFolder->user_id == $user->id || $user->sharedFolders()->findOrFail($pFolder->id)){
+        if(!preg_match('/\.\.*/', $request->name) && !preg_match('/\//', $request->name)){
+          $folder = new Folder();
+          $folder->name = $request->name;
+          $folder->user_id = $pFolder->user_id;
+          $folder->folder_id = $request->session()->get('currentFolder');
+          $folder->save();
 
-      $path = $folder->getPath();
-      Storage::disk('local')->makeDirectory('storage/'.Auth::user()->name.'/'.$path);
+          $path = $folder->getPath();
+          Storage::disk('local')->makeDirectory('storage/'.User::find($pFolder->user_id)->name.'/'.$path);
 
-      return redirect('/user/folders/'.$folder->folder_id);
+          return redirect('/user/folders/'.$folder->folder_id);
+        }
+        else return redirect('/user/folders/create');
+      }else return redirect('/user/folders/');
+
+
     }
 
     /**
@@ -71,11 +82,11 @@ class FolderController extends Controller
       $id=intval($id);
       $folder = Folder::find($id);
       $user = Auth::user();
-      //if($folder->user_id == $user->id){
+      if($folder->user_id == $user->id || $user->sharedFolders()->findOrFail($id)){
         session(['currentFolder' => $id]);
         return view('users.folders.show', compact('user','folder'));
-      //}
-      //else return redirect('/user/folders');
+      }
+      else return redirect('/user/folders');
     }
 
     /**
@@ -87,7 +98,9 @@ class FolderController extends Controller
     public function edit($id)
     {
         $folder = Folder::find($id);
-        return view('users.folders.edit', compact('folder'));
+        if($folder->user_id == $user->id || $user->sharedFolders()->find($id)->size()>0){
+          return view('users.folders.edit', compact('folder'));
+        }else return redirect('/user/folders');
     }
 
     /**
@@ -99,12 +112,15 @@ class FolderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $folder = Folder::find($id);
-        $oldPath = 'storage/'.Auth::user()->name.'/'.$folder->getPath();
+      $user = Auth::user();
+      $folder = Folder::find($id);
+      if($user->id==$folder->user_id){
+        $oldPath = 'storage/'.$user->name.'/'.$folder->getPath();
         $folder->update(['name' => ''.$request->name]);
-        $newPath = 'storage/'.Auth::user()->name.'/'.$folder->getPath();
+        $newPath = 'storage/'.$user->name.'/'.$folder->getPath();
         Storage::move( $oldPath, $newPath);
-        return redirect('user/folders'.$folder->id);
+        return redirect('user/folders/'.$folder->id);
+      }else return redirect('user/folders');
     }
 
     /**
@@ -130,25 +146,31 @@ class FolderController extends Controller
     {
       $folder = Folder::find($id);
       $user = Auth::user();
-      return view('users.folders.share', compact('folder','user'));
+      if($user->id==$folder->user_id) return view('users.folders.share', compact('folder','user'));
+      else return redirect('user/folders');
+
     }
 
     public function shareWith(Request $request){//rehacer, recursividad?
 
-      $targetUser = User::where('name', $request->name)->first();
+      $user = Auth::user();
+      $targetUser = User::where('name', $request->whom)->first();
 
-      $folder = Folder::find($request->folderID);
-      $targetUser->sharedFolders()->save($folder);
+      $folder = Folder::find($request->id);
 
-      foreach ($folder->childFolders as $cFolder) {
-        $targetUser->sharedFolders()->save($cFolder);
-      }
+      if($user->id==$folder->user_id){
+        $targetUser->sharedFolders()->save($folder);
 
-      foreach ($folder->childFiles as $cFile) {
-        $targetUser->sharedFiles()->save($cFile);
-      }
+        foreach ($folder->childFolders as $cFolder) {
+          $targetUser->sharedFolders()->save($cFolder);
+        }
 
-      return $targetUser->sharedFolders.'<br>'.$targetUser->sharedFiles;
+        foreach ($folder->childFiles as $cFile) {
+          $targetUser->sharedFiles()->save($cFile);
+        }
+        return 'succ';
+      }else return 'no succ';
+
 
     }
 
@@ -160,8 +182,11 @@ class FolderController extends Controller
     }
 
     public function fav($id){
+      $user = Auth::user();
       $folder = $user->folders()->find($id);
-      if($folder->favorite) $folder->update(['favorite' => 0]);
-      else $folder->update(['favorite' => 1]);
+      if($user->id==$folder->user_id){
+        if($folder->favorite) $folder->update(['favorite' => 0]);
+        else $folder->update(['favorite' => 1]);
+      }
     }
 }

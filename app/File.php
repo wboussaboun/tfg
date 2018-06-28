@@ -11,7 +11,8 @@ class File extends Model
       'name',
       'path',
       'folder_id',
-      'user_id'
+      'user_id',
+      'favorite'
     ];
 
     public function owner(){

@@ -131,6 +131,7 @@ class UserController extends Controller
     public function storeFriend(Request $request){
       $friend = User::where('name',$request->name)->first();
       Auth::user()->friends()->save($friend);
+      $user = Auth::user();
       return view('users.friends.show', compact('user'));
     }
 

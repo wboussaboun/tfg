@@ -2,6 +2,11 @@
 @section('title')
 {{$user->name}}'s Friends
 @endsection
+@section('sidenavActions')
+
+<a href="/friends">Show Friends</a>
+
+@endsection
 @section('content')
   {!! Form::open(['method' => 'POST', 'action'=>'UserController@storeFriend']) !!}
     <div class="form-group">
