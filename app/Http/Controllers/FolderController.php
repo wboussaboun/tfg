@@ -63,10 +63,10 @@ class FolderController extends Controller
           $path = $folder->getPath();
           Storage::disk('local')->makeDirectory('storage/'.User::find($pFolder->user_id)->name.'/'.$path);
 
-          return redirect('/user/folders/'.$folder->folder_id);
+          return "success";
         }
-        else return redirect('/user/folders/create');
-      }else return redirect('/user/folders/');
+        else return "incorrect name";
+      }else "error";
 
 
     }

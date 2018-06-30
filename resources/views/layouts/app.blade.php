@@ -23,7 +23,7 @@
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
                 <div class="navbar-header">
-
+                  <span onclick="openNav()">></span>
                     <!-- Collapsed Hamburger -->
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
                         <span class="sr-only">Toggle Navigation</span>
@@ -35,6 +35,7 @@
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
                         {{ config('app.name', 'Laravel') }}
+
                     </a>
                 </div>
 
@@ -85,7 +86,7 @@
         </div>
 
         <div id="main">
-          <span onclick="openNav()">></span>
+
 
         @yield('content')
       </div>

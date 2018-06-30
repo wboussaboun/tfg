@@ -72,7 +72,7 @@ class TasksController extends Controller
       $task->user_id = Auth::id();
       $task->save();
 
-      return redirect()->route('tasks.index');
+      return "success";
     }
 
     /**

@@ -4,7 +4,7 @@
 @endsection
 @section('sidenavActions')
 
-<a href="/friends/add">Add Friend</a>
+<a class="addFriend">Add Friend</a>
 @endsection
 @section('content')
 
@@ -28,22 +28,54 @@
 </tbody>
 </table>
 <div id="results"></div>
+
+<div id="ui_add_friend" style="display:none; cursor: default">
+        <h1>Add friend.</h1>
+        <input type="text" placeholder="john" class="friend"/>
+        <input type="button" id="yes" value="Share" />
+        <input type="button" id="no" value="Cancel" />
+</div>
+<script src="/js/jquery.blockUI.js"></script>
 <script>
 $(document).ready(function() {
 $(".deleteFriend").click(function(){
-              var id = $(this).data("id");
-              $.ajax(
-              {
-                  url: "/friends/delete/"+id,
-                  type: 'DELETE',
-                  success: function(result){
-                    $("#results").html(result);
-                    $(".friend-"+id).remove();
-                  }
-              });
+  var id = $(this).data("id");
+  $.ajax(
+  {
+    url: "/friends/delete/"+id,
+    type: 'DELETE',
+    success: function(result){
+      $("#results").html(result);
+      $(".friend-"+id).remove();
+    }
+  });
+});
 
 
-          });
+$(".addFriend").click(function(){
+  $.blockUI({ message: $('#ui_add_friend'), css: { width: '275px' } });
+});
+
+$('#yes').click(function() {
+  // update the block message
+  $.ajax(
+  {
+  url: "/friends/store",
+  type: 'POST',
+  data: {
+    '_token': $('input[name=_token]').val(),
+    'friend' : $(".friend").val(),
+  },
+    success: function(result){
+    $("#results").html(result);
+  }
+});
+});
+
+$('#no').click(function() {
+  $.unblockUI();
+  return false;
+});
 
 });
 </script>

@@ -9,7 +9,7 @@
 <script src="/css/fullcalendar.min.js"></script>
 @endsection
 @section('sidenavActions')
-<a href="/tasks/create">Create Event</a>
+<a class="addTask">Create Event</a>
 @endsection
 @section('content')
 
@@ -30,5 +30,60 @@
     </div>
 </div>
 
+<div id="results"></div>
+
+<div id="ui_add_task" style="display:none; cursor: default">
+        <h1>Add task.</h1>
+        Task name:
+        <br />
+        <input type="text" class="name" />
+        <br /><br />
+        Task description:
+        <br />
+        <textarea class="description"></textarea>
+        <br /><br />
+        Start time:
+        <br />
+        <input type="date" class="start_date" class="datepicker" />
+        <br /><br />
+        End time:
+        <br />
+        <input type="date" class="end_date" class="datepicker" />
+        <br /><br />
+        <input type="button" id="yes" value="Add Task" />
+        <input type="button" id="no" value="Cancel" />
+</div>
+<script src="/js/jquery.blockUI.js"></script>
+<script>
+$(".addTask").click(function(){
+  $.blockUI({ message: $('#ui_add_task'), css: { width: '275px' } });
+});
+
+$('#yes').click(function() {
+  // update the block message
+  $.ajax(
+  {
+  url: "/tasks",
+  type: 'POST',
+  data: {
+    '_token': $('input[name=_token]').val(),
+    'name' : $(".name").val(),
+    'description' : $(".description").val(),
+    'start_date' : $(".start_date").val(),
+    'end_date' : $(".end_date").val(),
+
+  },
+    success: function(result){
+    $("#results").html(result);
+    location.reload(true);
+  }
+});
+});
+
+$('#no').click(function() {
+  $.unblockUI();
+  return false;
+});
+</script>
 {!! $calendar->script() !!}
 @endsection
