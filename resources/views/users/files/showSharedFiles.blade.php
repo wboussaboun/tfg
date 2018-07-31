@@ -1,9 +1,9 @@
 @extends('layouts.logged')
 @section('title')
-file
+Shared Files
 @endsection
 @section('sidenavActions')
-
+<a href="/user/folders/">My Files</a>
 @endsection
 @section('content')
 

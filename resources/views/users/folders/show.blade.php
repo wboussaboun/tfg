@@ -9,11 +9,15 @@
 @section('sidenavActions')
 <a href="/user/folders/{{$folder->folder_id}}">Parent folder: {{$folder->folder_id}}</a><br>
 <a class="createFolder">Create Folder</a>
+<a class="uploadFile">Upload File</a>
+<a href="/user/folder/shared">View my shared folders</a>
+<a href="/user/file/shared">View my shared files</a>
+
 
 @endsection
 @section('content')
 
-<table class="table">
+<table class="table" id="folder_table">
 <thead>
   <tr>
     <th scope="col">#</th>
@@ -28,10 +32,11 @@
       <td>{{$cFolder->id}}</td>
       <td><a href="/user/folders/{{$cFolder->id}}">{{$cFolder->name}}</a></td>
       <td>{{$user->name}}</td>
-      <td><button class="deleteFolder" data-id="{{$cFolder->id}}">Delete Folder</button>
+      <td>
       @if($user->id==$cFolder->user_id)
-          <button class="shareFolder" data-id="{{$cFolder->id}}">Share Folder</button>
-          <button class="favFolder" data-id="{{$cFolder->id}}">Set as favorite</button>
+        <button class="deleteFolder" data-id="{{$cFolder->id}}">Delete Folder</button>
+        <button class="shareFolder" data-id="{{$cFolder->id}}">Share Folder</button>
+        <button class="favFolder" data-id="{{$cFolder->id}}">Set as favorite</button>
       @endif
       </td>
     </tr>
@@ -42,14 +47,15 @@
       <td>{{$cFile->id}}</td>
       <td><a href="/user/files/{{$cFile->id}}">{{$cFile->name}}</a></td>
       <td>{{$user->name}}</td>
-      <td><button class="deleteFile" data-id="{{$cFile->id}}">Delete File</button>
-      @if($user->id==$cFile->user_id)
+      <td>
+        @if($user->id==$cFile->user_id)
+          <button class="deleteFile" data-id="{{$cFile->id}}">Delete File</button>
           <button class="shareFile" data-id="{{$cFile->id}}">Share File</button>
           <button class="favFile" data-id="{{$cFile->id}}">Set as favorite</button>
           <form method="get" action="/user/files/dl/{{$cFile->id}}">
             {!! Form::submit('Download File', ['class' => 'btn btn-primary']) !!}
           </form>
-    @endif
+        @endif
       </td>
     </tr>
 
@@ -133,42 +139,119 @@
 <div id="results"></div>
 <input type="text" class="selected_value" hidden value=""/>
 
-<div id="ui_share_folder" style="display:none; cursor: default">
-        <h1>Whom to share with.</h1>
-        <input type="text" placeholder="john" class="whom"/>
-        <input type="button" id="yesShare" value="Share" />
-        <input type="button" id="no" value="Cancel" />
+<div id="ui_share_folder" hidden>
+  <div class="panel panel-default">
+    <div class="panel-heading">Whom to share with</div>
+
+    <div class="panel-body">
+      <input type="text" placeholder="john" class="whom"/>
+      <input type="button" id="yesShareFolder" class="btn btn-primary" value="Share" />
+      <input type="button" class="no" value="Cancel" />
+    </div>
+  </div>
+
 </div>
 
-<div id="ui_create_folder" style="display:none; cursor: default">
-        <h1>Enter the folder name.</h1>
-        <input type="text" placeholder="documents" class="folder_name"/>
-        <input type="button" id="yesFolder" value="Share" />
-        <input type="button" id="no" value="Cancel" />
+<div id="ui_share_file" hidden>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Whom to share with</div>
+
+    <div class="panel-body">
+      <input type="text" placeholder="john" class="whom"/>
+      <input type="button" id="yesShareFile" class="btn btn-primary" value="Share" />
+      <input type="button" class="no" value="Cancel" />
+    </div>
+  </div>
+
+
+</div>
+
+<div id="ui_delete_folder" hidden>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Are you sure you want to delete the folder?</div>
+
+    <div class="panel-body">
+      <input type="button" class="btn btn-danger yesDeleteFolder" value="Delete" />
+      <input type="button" class="no" value="Cancel" />
+    </div>
+  </div>
+
+
+</div>
+
+<div id="ui_delete_file" hidden>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Are you sure you want to delete the file?</div>
+
+    <div class="panel-body">
+      <input type="button" class="btn btn-danger yesDeleteFile" value="Delete" />
+      <input type="button" class="no" value="Cancel" />
+    </div>
+  </div>
+
+
+</div>
+
+<div id="ui_create_folder" hidden>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">Enter the folder name</div>
+
+    <div class="panel-body">
+      <input type="text" placeholder="documents" class="folder_name"/>
+      <input type="button" id="yesFolder" class="btn btn-primary" value="Create" />
+      <input type="button" class="no" value="Cancel" />
+    </div>
+  </div>
+
 </div>
 <script src="/js/jquery.blockUI.js"></script>
 <script>
+
+
+
 $(document).ready(function() {
+
 $(".deleteFolder").click(function(){
-              var id = $(this).data("id");
-              $.ajax(
-              {
-                  url: ""+id,
-                  type: 'DELETE',
-                  data: {
-                      '_token': $('input[name=_token]').val(),
-                  },
-                  success: function(result){
-                    $("#results").html(result);
-                    $(".folder-"+id).remove();
-                  }
-              });
+  var id = $(this).data("id");
+  $(".selected_value").val(id);
+  $.blockUI({ message: $('#ui_delete_folder')});
+});
 
+$(".uploadFile").click(function(){
+  console.log("enter upload file");
+  $.blockUI({ message: $('#ui_upload_file')});
+});
 
-          });
+$(".yesDeleteFolder").click(function(){
+  console.log("yes delete folder");
+  id = $(".selected_value").val();
+  console.log(id);
+  $.ajax({
+    url: "/user/folders/"+id,
+    type: 'DELETE',
+    data: {
+      '_token': $('input[name=_token]').val(),
+    },
+    success: function(result){
+      $("#results").html(result);
+      $(".folder-"+id).remove();
+      $.unblockUI();
+    }
+  });
+});
 
 $(".deleteFile").click(function(){
-        var id = $(this).data("id");
+  var id = $(this).data("id");
+  $(".selected_value").val(id);
+  $.blockUI({ message: $('#ui_delete_file')});
+});
+
+$(".yesDeleteFile").click(function(){
+        var id = id = $(".selected_value").val();
         $.ajax(
         {
             url: "/user/files/"+id,
@@ -179,6 +262,7 @@ $(".deleteFile").click(function(){
             success: function(result){
               $("#results").html(result);
               $(".file-"+id).remove();
+              $.unblockUI();
             }
           });
 });
@@ -208,7 +292,7 @@ $(".favFile").click(function(){
       '_token': $('input[name=_token]').val(),
     },
       success: function(result){
-      if (result==1) $("#results").html('success');
+        if (result==1) $("#results").html('success');
         else $("#results").html('error');
       }
   });
@@ -218,19 +302,43 @@ $(".favFile").click(function(){
 $(".shareFolder").click(function(){
   var id = $(this).data("id");
   $(".selected_value").val(id);
-  $.blockUI({ message: $('#ui_share_folder'), css: { width: '275px' } });
+  $.blockUI({ message: $('#ui_share_folder')});
 
+});
+
+$(".shareFile").click(function(){
+  var id = $(this).data("id");
+  $(".selected_value").val(id);
+  $.blockUI({ message: $('#ui_share_file') });
 });
 
 $(".createFolder").click(function(){
-  $.blockUI({ message: $('#ui_create_folder'), css: { width: '275px' } });
+  $.blockUI({ message: $('#ui_create_folder') });
 });
 
-$('#yesShare').click(function() {
+$('#yesShareFolder').click(function() {
   // update the block message
   $.ajax(
   {
     url: "/user/folder/shareFolder",
+    type: 'POST',
+    data: {
+      '_token': $('input[name=_token]').val(),
+      'id' : $(".selected_value").val(),
+      'whom' : $(".whom").val()
+    },
+    success: function(result){
+      $("#results").html(result);
+    }
+  });
+
+});
+
+$('#yesShareFile').click(function() {
+  // update the block message
+  $.ajax(
+  {
+    url: "/user/file/shareFile/",
     type: 'POST',
     data: {
       '_token': $('input[name=_token]').val(),
@@ -256,6 +364,53 @@ $('#yesFolder').click(function() {
     },
     success: function(result){
       $("#results").html(result);
+
+      var tableRef = document.getElementById('folder_table').getElementsByTagName('tbody')[0];
+
+// Insert a row in the table at the last row
+      var newRow   = tableRef.insertRow(tableRef.rows.length);
+      newRow.setAttribute("class", "folder-"+result)
+// Insert a cell in the row at index 0
+      var newCell  = newRow.insertCell(0);
+      var newText  = document.createTextNode(result);
+      newCell.appendChild(newText);
+
+      var newCell  = newRow.insertCell(1);
+      var newLink = document.createElement("a");
+      newLink.setAttribute("href", "/user/folders/"+result);
+      var newText  = document.createTextNode($(".folder_name").val());
+      newLink.appendChild(newText);
+      newCell.appendChild(newLink);
+
+      var newCell  = newRow.insertCell(2);
+      var newText  = document.createTextNode("{{$user->name}}");
+      newCell.appendChild(newText);
+
+      var newCell  = newRow.insertCell(3);
+      var newButton = document.createElement("button");
+      var newText  = document.createTextNode("Delete Folder");
+      newButton.appendChild(newText);
+      newButton.setAttribute("data-id", result);
+      newButton.setAttribute("class", "deleteFolder");
+      newCell.appendChild(newButton);
+
+      var newButton = document.createElement("button");
+      var newText  = document.createTextNode("Share Folder");
+      newButton.appendChild(newText);
+      newButton.setAttribute("data-id", result);
+      newButton.setAttribute("class", "shareFolder");
+      newCell.appendChild(newButton);
+
+      var newButton = document.createElement("button");
+      var newText  = document.createTextNode("Set as favorite");
+      newButton.appendChild(newText);
+      newButton.setAttribute("data-id", result);
+      newButton.setAttribute("class", "favFolder");
+      newCell.appendChild(newButton);
+
+
+
+
     }
   });
 
@@ -264,7 +419,7 @@ $('#yesFolder').click(function() {
 
 
 
-$('#no').click(function() {
+$('.no').click(function() {
     $.unblockUI();
     return false;
 });

@@ -169,7 +169,11 @@ class FileController extends Controller
     public function fav($id){
       $user = Auth::user();
       $file = $user->files()->find($id);
-      if($file->favorite) $file->update(['favorite' => 0]);
-      else $file->update(['favorite' => 1]);
+      if($user->id==$file->user_id){
+        if($file->favorite) $file->update(['favorite' => 0]);
+        else $file->update(['favorite' => 1]);
+        return 1;
+      }
+      return 0;
     }
 }

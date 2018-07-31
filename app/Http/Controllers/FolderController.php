@@ -54,16 +54,22 @@ class FolderController extends Controller
       $pFolder = Folder::find(session()->get('currentFolder'));
       if($pFolder->user_id == $user->id || $user->sharedFolders()->findOrFail($pFolder->id)){
         if(!preg_match('/\.\.*/', $request->name) && !preg_match('/\//', $request->name)){
-          $folder = new Folder();
-          $folder->name = $request->name;
-          $folder->user_id = $pFolder->user_id;
-          $folder->folder_id = $request->session()->get('currentFolder');
-          $folder->save();
 
-          $path = $folder->getPath();
-          Storage::disk('local')->makeDirectory('storage/'.User::find($pFolder->user_id)->name.'/'.$path);
+          if (Folder::where('folder_id', session()->get('currentFolder'))->where('name', $request->name)->count()>0) {
+            return "A Folder with that name alredy exist";
+          }else {
+            $folder = new Folder();
+            $folder->name = $request->name;
+            $folder->user_id = $pFolder->user_id;
+            $folder->folder_id = $request->session()->get('currentFolder');
+            $folder->save();
 
-          return "success";
+            $path = $folder->getPath();
+            Storage::disk('local')->makeDirectory('storage/'.User::find($pFolder->user_id)->name.'/'.$path);
+
+            return $folder->id;
+          }
+
         }
         else return "incorrect name";
       }else "error";
@@ -187,6 +193,8 @@ class FolderController extends Controller
       if($user->id==$folder->user_id){
         if($folder->favorite) $folder->update(['favorite' => 0]);
         else $folder->update(['favorite' => 1]);
+        return 1;
       }
+      return 0;
     }
 }

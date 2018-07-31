@@ -8,6 +8,7 @@
 @section('photoScript')
   <script>
     $(document).ready(function() {
+      openNav();
         $.ajax(
         {
           url: "/user/photo/"+{{$user->id}},
