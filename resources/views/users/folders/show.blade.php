@@ -9,7 +9,6 @@
 @section('sidenavActions')
 <a href="/user/folders/{{$folder->folder_id}}">Parent folder: {{$folder->folder_id}}</a><br>
 <a class="createFolder">Create Folder</a>
-<a class="uploadFile">Upload File</a>
 <a href="/user/folder/shared">View my shared folders</a>
 <a href="/user/file/shared">View my shared files</a>
 

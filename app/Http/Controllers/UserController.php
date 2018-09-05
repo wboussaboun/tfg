@@ -130,7 +130,7 @@ class UserController extends Controller
 
     public function storeFriend(Request $request){
 
-      $friend = User::where('name',$request->name)->first();
+      $friend = User::where('name',$request->friend)->first();
 
       if ($friend===null) return 'user doesn\'t exist';
 
@@ -140,9 +140,11 @@ class UserController extends Controller
     }
 
     public function deleteFriend($id)
-    {//asegurarse de esto
+    {
         $user = Auth::user();
-        $user->friends->find($id)->detach();
+        $user->friends()->wherePivot('user1_id','=',Auth::user()->id)->detach();
+        $user->friends()->wherePivot('user2_id','=',Auth::user()->id)->detach();
+        return "success";
     }
 
 

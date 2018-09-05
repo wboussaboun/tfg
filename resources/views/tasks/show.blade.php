@@ -16,6 +16,16 @@
   Start time: {{$task->start_date}}
   <br /><br />
   End time: {{$task->end_date}}
+  <br /><br />
+  <form method="post" action="/tasks/{{$task->id}}">
+    <input type="hidden" name="_method" value="DELETE">
+    <div class="form-group" >
+        {{ csrf_field() }}
+            <button type="submit" class="btn btn-danger">
+                Delete Task
+            </button>
+    </div>
+  </form>
 
 
 @endsection

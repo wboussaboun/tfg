@@ -57,7 +57,7 @@ class FileController extends Controller
         if ($clientFile->getClientSize() > 104857600) return "file too big";
 
         if($pFolder->user_id == $user->id || $user->sharedFolders()->findOrFail($pFolder->id)){
-          //if(!preg_match('/\.\.*/', $clientFile->getClientOriginalName()) && !preg_match('/\//', $clientFile->getClientOriginalName())){
+
             $file = new File();
             $file->name = $clientFile->getClientOriginalName();
             $file->user_id = $pFolder->user_id;
@@ -73,7 +73,7 @@ class FileController extends Controller
             Storage::disk('local')->putFileAs('storage/'.User::find($pFolder->user_id)->name.'/'.$path, $clientFile,$file->name);
 
             return redirect('/user/folders/'.$file->folder_id);
-          //}else return "filename problem";
+          
         }else return "user problem";
     }
 

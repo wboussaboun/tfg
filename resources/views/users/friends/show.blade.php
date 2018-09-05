@@ -31,8 +31,8 @@
 
 <div id="ui_add_friend" style="display:none; cursor: default">
         <h1>Add friend.</h1>
-        <input type="text" placeholder="john" class="friend"/>
-        <input type="button" id="yes" value="Share" />
+        <input type="text" placeholder="john" id="friend"/>
+        <input type="button" id="yes" value="Add" />
         <input type="button" id="no" value="Cancel" />
 </div>
 <script src="/js/jquery.blockUI.js"></script>
@@ -42,29 +42,31 @@ $(".deleteFriend").click(function(){
   var id = $(this).data("id");
   $.ajax(
   {
-    url: "/friends/delete/"+id,
-    type: 'DELETE',
+    url: "/friend/delete/"+id,
+    type: 'GET',
     success: function(result){
       $("#results").html(result);
-      $(".friend-"+id).remove();
+      $("#friend-"+id).remove();
     }
   });
 });
 
 
 $(".addFriend").click(function(){
+
   $.blockUI({ message: $('#ui_add_friend'), css: { width: '275px' } });
 });
 
 $('#yes').click(function() {
   // update the block message
+  console.log($("#friend").val())
   $.ajax(
   {
   url: "/friends/store",
   type: 'POST',
   data: {
     '_token': $('input[name=_token]').val(),
-    'friend' : $(".friend").val(),
+    'friend' : $("#friend").val(),
   },
     success: function(result){
     $("#results").html(result);

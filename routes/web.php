@@ -37,7 +37,7 @@ Route::get('/user/folder/shared', 'FolderController@showMySharedFolders');
 Route::get('/friends', 'UserController@showMyFriends');
 Route::get('/friends/add', 'UserController@addFriend');
 Route::post('/friends/store', 'UserController@storeFriend');
-Route::delete('/friend/delete', 'UserController@deleteFriend');
+Route::get('/friend/delete/{id}', 'UserController@deleteFriend');
 Route::resource('/tasks', 'TasksController');
 Route::get('/user/folders/fav/{id}', 'FolderController@fav');
 Route::get('/user/files/fav/{id}', 'FileController@fav');

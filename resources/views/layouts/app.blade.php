@@ -33,7 +33,7 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        {{ config('app.name', 'Storage') }}
 
                     </a>
                 </div>
@@ -78,9 +78,8 @@
                 </div>
             </div>
         </nav>
-        <span onclick="openNav()">__=></span>
+
         <div id="mySidenav" class="sidenav">
-          <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
           @yield('sidenavActions')
         </div>
 
