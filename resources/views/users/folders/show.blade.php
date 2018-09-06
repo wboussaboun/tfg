@@ -143,7 +143,7 @@
     <div class="panel-heading">Whom to share with</div>
 
     <div class="panel-body">
-      <input type="text" placeholder="john" class="whom"/>
+      <input type="text" placeholder="john" id="whomFolder"/>
       <input type="button" id="yesShareFolder" class="btn btn-primary" value="Share" />
       <input type="button" class="no" value="Cancel" />
     </div>
@@ -157,7 +157,7 @@
     <div class="panel-heading">Whom to share with</div>
 
     <div class="panel-body">
-      <input type="text" placeholder="john" class="whom"/>
+      <input type="text" placeholder="john" id="whomFile"/>
       <input type="button" id="yesShareFile" class="btn btn-primary" value="Share" />
       <input type="button" class="no" value="Cancel" />
     </div>
@@ -324,7 +324,7 @@ $('#yesShareFolder').click(function() {
     data: {
       '_token': $('input[name=_token]').val(),
       'id' : $(".selected_value").val(),
-      'whom' : $(".whom").val()
+      'whom' : $("#whomFolder").val()
     },
     success: function(result){
       $("#results").html(result);
@@ -337,12 +337,12 @@ $('#yesShareFile').click(function() {
   // update the block message
   $.ajax(
   {
-    url: "/user/file/shareFile/",
+    url: "/user/file/shareFile",
     type: 'POST',
     data: {
       '_token': $('input[name=_token]').val(),
       'id' : $(".selected_value").val(),
-      'whom' : $(".whom").val()
+      'whom' : $("#whomFile").val()
     },
     success: function(result){
       $("#results").html(result);

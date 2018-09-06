@@ -73,7 +73,7 @@ class FileController extends Controller
             Storage::disk('local')->putFileAs('storage/'.User::find($pFolder->user_id)->name.'/'.$path, $clientFile,$file->name);
 
             return redirect('/user/folders/'.$file->folder_id);
-          
+
         }else return "user problem";
     }
 
@@ -154,8 +154,17 @@ class FileController extends Controller
     }
 
     public function shareWith(Request $request){
-      $targetUser = User::where('name', $request->name)->first();
-      return $targetUser->sharedFiles()->save(File::find($request->fileID));
+      $user = Auth::user();
+      $targetUser = User::where('name', $request->whom)->first();
+
+      if (!$targetUser) return "user does not exist";
+
+      $file = File::find($request->id);
+
+      if($user->id==$file->user_id) {
+        $targetUser->sharedFiles()->save($file);
+        return "success";
+      }else return "no success";
 
     }
 
@@ -172,8 +181,8 @@ class FileController extends Controller
       if($user->id==$file->user_id){
         if($file->favorite) $file->update(['favorite' => 0]);
         else $file->update(['favorite' => 1]);
-        return 1;
+        return "success";
       }
-      return 0;
+      return "no success";
     }
 }

@@ -144,8 +144,8 @@ class FolderController extends Controller
       if($folder->user_id == $user->id){
         $folder->delete();
         Storage::disk('local')->deleteDirectory('storage/'.Auth::user()->name.'/'.$path);
-        return "cool";
-      } return "not cool";
+        return "success";
+      } return "no success";
     }
 
     public function share($id)
@@ -157,11 +157,11 @@ class FolderController extends Controller
 
     }
 
-    public function shareWith(Request $request){//rehacer, recursividad?
+    public function shareWith(Request $request){
 
       $user = Auth::user();
       $targetUser = User::where('name', $request->whom)->first();
-
+      if (!$targetUser) return "user does not exist";
       $folder = Folder::find($request->id);
 
       if($user->id==$folder->user_id){
@@ -174,8 +174,8 @@ class FolderController extends Controller
         foreach ($folder->childFiles as $cFile) {
           $targetUser->sharedFiles()->save($cFile);
         }
-        return 'succ';
-      }else return 'no succ';
+        return 'success';
+      }else return 'no success';
 
 
     }
